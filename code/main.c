@@ -83,6 +83,8 @@ int play_song(){
   char song_path[300];
   struct Node* temp = start;
 
+  char ch;
+
   song_menu(temp->name);
   snprintf(song_path, sizeof(song_path), "%s%s", MUSIC_DIR, start->name);
 
@@ -113,7 +115,39 @@ int play_song(){
     }
 
     if(kbhit()){
-      break;
+      ch = getch();
+
+      switch (ch) {
+
+        case 'q':
+        return 0;
+        break;
+
+        case 'd':
+        if(temp->next != NULL){
+          ma_sound_uninit(&current);
+          temp = temp->next;
+          snprintf(song_path, sizeof(song_path), "%s%s", MUSIC_DIR, temp->name);
+          ma_sound_init_from_file(&engine, song_path, MA_SOUND_FLAG_STREAM, NULL, NULL, &current); 
+          ma_sound_start(&current);
+          song_menu(temp->name);
+        }
+        break;
+
+        case 'a':
+        if(temp->prev != NULL){
+          ma_sound_uninit(&current);
+          temp = temp->prev;
+          snprintf(song_path, sizeof(song_path), "%s%s", MUSIC_DIR, temp->name);
+          ma_sound_init_from_file(&engine, song_path, MA_SOUND_FLAG_STREAM, NULL, NULL, &current); 
+          ma_sound_start(&current);
+          song_menu(temp->name);
+        }
+        break;
+
+        default:
+        break;
+      }
     }
   }
 
@@ -143,5 +177,7 @@ void song_menu(char* curr_song){
     i++;
   }
 
-  printf("Press Enter to quit...");
+  free(temp);
+
+  printf("\n(q)quit\t(d)next song\t(a)previous song");
 }
