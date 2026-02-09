@@ -18,6 +18,7 @@ struct Node* start;
 
 
 ma_engine engine;
+ma_sound current;
 
 int initialize_engine();
 int deinitialize_engine();
@@ -48,7 +49,6 @@ void initialize_songs(){
 int main(){
 
 
-  initialize_engine();
   initialize_songs();
 
   char curr_song[200]; 
@@ -57,6 +57,7 @@ int main(){
 
   song_menu();
   play_song(curr_song);
+
 
   return 0;
 }
@@ -80,25 +81,39 @@ int deinitialize_engine(){
 
 int play_song(char* song_name){
 
+  initialize_engine();
+
   char song_path[300];
+  struct Node* temp = start;
 
   snprintf(song_path, sizeof(song_path), "%s%s", MUSIC_DIR, song_name);
 
-  ma_result res = ma_engine_play_sound(
-    &engine,
-    song_path,
-    NULL
-  );
-
-  if(res != MA_SUCCESS){
-    printf("Failed to play sound: %d\n", res);
+  if(
+    ma_sound_init_from_file(&engine, song_path, MA_SOUND_FLAG_STREAM, NULL, NULL, &current) != MA_SUCCESS
+  ){
+    printf("Song Loading Failed\n");
+    return -1;
   }
 
+  ma_sound_start(&current);
+
   printf("Press Enter to quit...");
-  getch();
+  while(1){
+    if(!ma_sound_is_playing(&current) && temp!=NULL){
+      temp = temp->next;
+      ma_sound_uninit(&current);
+      snprintf(song_path, sizeof(song_path), "%s%s", MUSIC_DIR, temp->name);
+      ma_sound_init_from_file(&engine, song_path, MA_SOUND_FLAG_STREAM, NULL, NULL, &current); 
+      ma_sound_start(&current);
+    }
 
+    if(kbhit()){
+      break;
+    }
+  }
+
+  ma_sound_uninit(&current);
   deinitialize_engine();
-
 }
 
 
