@@ -6,6 +6,8 @@
 #include <string.h>
 
 #define MUSIC_DIR "../music/"
+#define GREEN   "\x1b[32m"
+#define RESET   "\x1b[0m"
 
 struct Node{
   char name[200];
@@ -23,8 +25,8 @@ ma_sound current;
 int initialize_engine();
 int deinitialize_engine();
 
-int play_song(char*);
-void song_menu();
+int play_song();
+void song_menu(char*);
 
 //initial music files
 
@@ -51,12 +53,7 @@ int main(){
 
   initialize_songs();
 
-  char curr_song[200]; 
-
-  strcpy(curr_song, start->name);
-
-  song_menu();
-  play_song(curr_song);
+  play_song();
 
 
   return 0;
@@ -79,14 +76,15 @@ int deinitialize_engine(){
   ma_engine_uninit(&engine);
 } 
 
-int play_song(char* song_name){
+int play_song(){
 
   initialize_engine();
 
   char song_path[300];
   struct Node* temp = start;
 
-  snprintf(song_path, sizeof(song_path), "%s%s", MUSIC_DIR, song_name);
+  song_menu(temp->name);
+  snprintf(song_path, sizeof(song_path), "%s%s", MUSIC_DIR, start->name);
 
   if(
     ma_sound_init_from_file(&engine, song_path, MA_SOUND_FLAG_STREAM, NULL, NULL, &current) != MA_SUCCESS
@@ -97,10 +95,17 @@ int play_song(char* song_name){
 
   ma_sound_start(&current);
 
-  printf("Press Enter to quit...");
   while(1){
-    if(!ma_sound_is_playing(&current) && temp!=NULL){
+    if(!ma_sound_is_playing(&current)){
+
       temp = temp->next;
+
+      if(temp == NULL){
+        break;
+      }
+
+      song_menu(temp->name);
+
       ma_sound_uninit(&current);
       snprintf(song_path, sizeof(song_path), "%s%s", MUSIC_DIR, temp->name);
       ma_sound_init_from_file(&engine, song_path, MA_SOUND_FLAG_STREAM, NULL, NULL, &current); 
@@ -117,7 +122,9 @@ int play_song(char* song_name){
 }
 
 
-void song_menu(){
+void song_menu(char* curr_song){
+
+  system("cls");
 
   struct Node* temp;
   int i = 1;
@@ -127,9 +134,14 @@ void song_menu(){
   temp = start;
 
   while(temp != NULL){
-    printf("%d. %s\n",i,temp->name);
+    if(strcmp(temp->name, curr_song) == 0){
+      printf(GREEN "%d. %s <-currently playing..." RESET "\n",i,temp->name);
+    }else{
+      printf("%d. %s\n",i,temp->name);
+    }
     temp = temp->next;
     i++;
   }
 
+  printf("Press Enter to quit...");
 }
