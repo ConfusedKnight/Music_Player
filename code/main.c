@@ -35,6 +35,7 @@ void initialize_songs(){
   start = m1;
 
   struct Node* m2 = (struct Node*)malloc(sizeof(struct Node));
+  struct Node* m3 = (struct Node*)malloc(sizeof(struct Node));
 
 
   strcpy(m1->name, "Spongebob soundtrack - Drunken Sailor.mp3");
@@ -43,7 +44,11 @@ void initialize_songs(){
 
   strcpy(m2->name, "C418_ Aria Math.mp3");
   m2->prev = m1; 
-  m2->next = NULL;
+  m2->next = m3;
+
+  strcpy(m3->name, "Noosphere.mp3");
+  m3->prev = m2; 
+  m3->next = NULL;
 }
 
 
@@ -67,7 +72,7 @@ int initialize_engine(){
 
   result = ma_engine_init(NULL, &engine);
   if (result != MA_SUCCESS) {
-    return -1;  // Failed to initialize the engine.
+    return -1; 
   }
 
 }
