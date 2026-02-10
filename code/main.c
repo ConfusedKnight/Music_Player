@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MUSIC_DIR "../music/"
-#define GREEN   "\x1b[32m"
-#define RESET   "\x1b[0m"
+#define MUSIC_DIR   "../music/"
+#define GREEN       "\x1b[32m"
+#define RED         "\x1b[31m"
+#define RESET       "\x1b[0m"
 
 struct Node{
   char name[200];
@@ -36,19 +37,35 @@ void initialize_songs(){
 
   struct Node* m2 = (struct Node*)malloc(sizeof(struct Node));
   struct Node* m3 = (struct Node*)malloc(sizeof(struct Node));
+  struct Node* m4 = (struct Node*)malloc(sizeof(struct Node));
+  struct Node* m5 = (struct Node*)malloc(sizeof(struct Node));
+  struct Node* m6 = (struct Node*)malloc(sizeof(struct Node));
 
 
-  strcpy(m1->name, "Spongebob soundtrack - Drunken Sailor.mp3");
+  strcpy(m1->name, "C418_ Aria Math.mp3");
   m1->prev = NULL;
   m1->next = m2;
 
-  strcpy(m2->name, "C418_ Aria Math.mp3");
+  strcpy(m2->name, "Spongebob soundtrack - Drunken Sailor.mp3");
   m2->prev = m1; 
   m2->next = m3;
 
   strcpy(m3->name, "Noosphere.mp3");
   m3->prev = m2; 
-  m3->next = NULL;
+  m3->next = m4;
+
+  strcpy(m4->name, "Pacific Rim Soundtrack _ Go Big Or Go Extinct.mp3");
+  m4->prev = m3; 
+  m4->next = m5;
+
+  strcpy(m5->name, "Doom OST - E1M1 - At Doom's Gate.mp3");
+  m5->prev = m4; 
+  m5->next = m6;
+
+  strcpy(m6->name, "Halo Infinite_ Through the Trees 8-Bit Version.mp3");
+  m6->prev = m5; 
+  m6->next = NULL;
+
 }
 
 
@@ -158,6 +175,7 @@ int play_song(){
 
   ma_sound_uninit(&current);
   deinitialize_engine();
+  free(temp);
 }
 
 
@@ -174,7 +192,7 @@ void song_menu(char* curr_song){
 
   while(temp != NULL){
     if(strcmp(temp->name, curr_song) == 0){
-      printf(GREEN "%d. %s <-currently playing..." RESET "\n",i,temp->name);
+      printf(GREEN "%d. %s " RED "<-currently playing..." RESET "\n",i,temp->name);
     }else{
       printf("%d. %s\n",i,temp->name);
     }
